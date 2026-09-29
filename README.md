@@ -1,29 +1,32 @@
 # Analysis of Cardiac Health Factors
 
-SQL-based analysis of a heart-disease dataset containing demographic and clinical variables such as age, sex, chest-pain type, resting blood pressure, cholesterol, fasting blood sugar, resting ECG results, maximum heart rate, exercise-induced angina, ST depression, major-vessel count, thalassemia code, and a binary heart-disease target.
+SQL-based exploratory analysis of a heart-disease dataset containing demographic and clinical variables such as age, sex, chest-pain type, resting blood pressure, cholesterol, fasting blood sugar, resting ECG results, maximum heart rate, exercise-induced angina, ST depression, major-vessel count, thalassemia code, and a binary heart-disease target.
 
-The project focuses on descriptive analysis in MySQL. It is intended for learning SQL, data cleaning, grouping, aggregation, and interpretation of health-related tabular data. It is not a clinical diagnostic system.
+The project focuses on data validation, SQL aggregation, prevalence calculations, and careful interpretation of health-related tabular data. It is a portfolio/learning project and is not a medical diagnostic system.
 
-## Project goals
+## Project Objectives
 
-- inspect the dataset before analysis
-- create a reproducible MySQL table
-- validate category ranges and missing values
-- measure heart-disease prevalence across selected factors
-- compare demographic and clinical groups
-- document the meaning and limitations of the fields
-- keep the analysis queries separate from schema and data-quality checks
+- create a reproducible MySQL schema for the dataset
+- validate category values, missing values, ranges, and duplicates before analysis
+- measure heart-disease prevalence across demographic and clinical groups
+- correct misleading percentage calculations from the original project
+- keep database setup, data loading, quality checks, and analysis queries separate
+- document the dataset fields and category encodings used by this repository
 
-## Repository structure
+## Project Structure
 
 ```text
 Analysis-of-Cardiac-Health-Factors/
 ├── data/
-│   └── heart_dataset.csv
+│   ├── heart_dataset.csv
+│   └── README.md
 ├── docs/
 │   ├── DATA_DICTIONARY.md
+│   ├── ANALYSIS_GUIDE.md
 │   ├── cardiac-health-presentation.pdf
 │   └── cardiac-health-report.docx
+├── results/
+│   └── README.md
 ├── sql/
 │   ├── 01_schema.sql
 │   ├── 02_load_data_template.sql
@@ -31,42 +34,55 @@ Analysis-of-Cardiac-Health-Factors/
 │   └── 04_analysis_queries.sql
 ├── .gitattributes
 ├── .gitignore
+├── MIGRATION_GUIDE.md
+├── REPLACE_IN_OLD_FOLDER.bat
 └── README.md
 ```
 
+The CSV, PDF, and DOCX are the original project assets. The migration script moves them from the old repository root into the structure shown above.
+
 ## Dataset
 
-The CSV uses the 14-column schema commonly seen in processed Cleveland heart-disease datasets:
+The CSV uses the following 14-column schema:
 
 ```text
 age, sex, cp, trestbps, chol, fbs, restecg,
 thalach, exang, oldpeak, slope, ca, thal, target
 ```
 
-The original repository did not document the exact download URL used for this copy. Before presenting the dataset as an exact UCI export, verify the original source and add it here.
+The exact original download URL for the processed CSV was not documented in the first version of this repository. The column layout is based on the Cleveland-style Heart Disease dataset.
 
-Reference for the underlying Heart Disease dataset:
+Reference for the underlying UCI Heart Disease dataset:
 
 https://archive.ics.uci.edu/dataset/45/heart+disease
 
-The repository CSV currently contains 303 total lines: one header row and 302 data rows. Verify its exact provenance before comparing it with other processed Cleveland copies, because different public versions use different row counts and category encodings.
+Different processed versions of this dataset use different encodings. The SQL in this repository follows the coding used by the project CSV and the original project documentation.
 
-## Important coding note
+## Important Chest-Pain Coding
 
-The repository CSV uses chest-pain codes `1` through `4`. The maintained schema and analysis queries use those values directly. Other public heart-disease CSVs may use zero-based `0` through `3` coding, so do not copy mappings from another dataset without checking the actual file.
+The `cp` column in this project uses values from `1` through `4`:
 
-See [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) before interpreting the queries.
+| Code | Chest-pain type |
+|---:|---|
+| 1 | Typical angina |
+| 2 | Atypical angina |
+| 3 | Non-anginal pain |
+| 4 | Asymptomatic |
+
+Do not replace this with the zero-based `0-3` mapping used by some other processed versions of the dataset.
+
+See [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) before interpreting the analysis.
 
 ## Requirements
 
 - MySQL 8.x or a compatible MySQL environment
-- MySQL Workbench is optional but useful for importing the CSV
+- MySQL Workbench is optional but convenient for CSV import
 
-No Python environment is required for the maintained project.
+No Python environment is required.
 
-## How to run
+## How to Run
 
-### 1. Create the database and table
+### 1. Create the Database and Table
 
 Run:
 
@@ -74,25 +90,34 @@ Run:
 sql/01_schema.sql
 ```
 
+This creates:
+
+```text
+cardiac_health_analysis
+heart_disease_data
+```
+
 ### 2. Import the CSV
 
-The simplest method in MySQL Workbench is:
+The dataset should be stored at:
 
-1. Create the table using `01_schema.sql`.
-2. Open **Table Data Import Wizard**.
-3. Select `data/heart_dataset.csv`.
-4. Import it into `heart_disease_data`.
-5. Confirm that the columns map in the same order as the CSV header.
+```text
+data/heart_dataset.csv
+```
 
-A `LOAD DATA LOCAL INFILE` example is also provided in:
+You can import it with MySQL Workbench's **Table Data Import Wizard**, or edit and run:
 
 ```text
 sql/02_load_data_template.sql
 ```
 
-Update the file path before running it.
+For Windows paths in `LOAD DATA LOCAL INFILE`, use forward slashes, for example:
 
-### 3. Validate the data
+```text
+C:/Users/YourName/Projects/Analysis-of-Cardiac-Health-Factors/data/heart_dataset.csv
+```
+
+### 3. Validate the Dataset
 
 Run:
 
@@ -100,9 +125,19 @@ Run:
 sql/03_data_quality_checks.sql
 ```
 
-Check the row count, missing values, target balance, and category ranges before interpreting results.
+This checks:
 
-### 4. Run the analysis
+- imported row count
+- NULL values
+- target-class distribution
+- category values
+- numeric ranges
+- duplicate rows
+- values outside expected ranges
+
+Do not interpret the analysis until these checks look reasonable.
+
+### 4. Run the Analysis
 
 Run:
 
@@ -110,72 +145,109 @@ Run:
 sql/04_analysis_queries.sql
 ```
 
-The analysis includes:
+The queries cover:
 
-- overall heart-disease prevalence
-- prevalence by sex
-- prevalence by age group
-- chest-pain category comparison
-- fasting-blood-sugar comparison
-- cholesterol grouping
-- exercise-induced angina comparison
-- resting-ECG comparison
-- major-vessel count comparison
-- average clinical measurements by target class
+1. overall disease prevalence
+2. prevalence by sex
+3. prevalence by age group
+4. prevalence by chest-pain type
+5. fasting-blood-sugar groups
+6. cholesterol groups
+7. exercise-induced angina
+8. resting ECG code
+9. number of major vessels
+10. thalassemia code
+11. average continuous measurements by target class
 
-## Key corrections from the original SQL
+## Main Corrections from the Original Project
 
-The original project was useful as a first analysis, but several query definitions needed correction.
+### Percentage by Sex
 
-### Chest-pain coding
-
-The current repository CSV contains `cp` values from `1` to `4`, so the maintained schema and labels use the same `1` to `4` coding. This was verified against the file stored in `data/heart_dataset.csv`.
-
-### Percentage by sex
-
-The old gender query calculated each gender's share of the full dataset. That is not the same as disease prevalence within each gender.
-
-The updated query reports:
+The original SQL calculated:
 
 ```text
-disease-positive records / total records in that gender
+records in a gender / all dataset records
+```
+
+That answers "what percentage of the dataset belongs to this gender?" It does not answer "what percentage of this gender is disease-positive?"
+
+The maintained query calculates:
+
+```text
+disease-positive records in the group / all records in that group
+```
+
+which is the prevalence within that group.
+
+### Chest-Pain Mapping
+
+The maintained project uses the `1-4` chest-pain encoding present in the original project:
+
+```text
+1 = Typical angina
+2 = Atypical angina
+3 = Non-anginal pain
+4 = Asymptomatic
 ```
 
 ### Terminology
 
-The target represents heart-disease status in the dataset. The cleaned SQL avoids calling every positive record a "heart attack" or treating the result as a clinical risk estimate.
+The target is treated as a heart-disease class, not as an individual probability of having a heart attack.
+
+The maintained SQL therefore uses terms such as:
+
+```text
+disease-positive records
+disease-negative records
+heart-disease prevalence
+```
+
+instead of "high-risk patient" or "prone to heart attack".
 
 ### Reproducibility
 
-The old SQL created a table but did not include a reproducible CSV-loading step or data-quality checks. Those steps are now separated into dedicated SQL files.
+The original single SQL file mixed table creation and analysis queries. The maintained version separates:
 
-## Analysis interpretation
+- schema creation
+- data loading
+- data-quality checks
+- analysis
 
-The queries show associations within this dataset. They do not prove that a factor causes heart disease. They also should not be used to make medical decisions about individuals.
+This makes the project easier to review, rerun, and explain in an interview.
+
+## Interpreting the Results
+
+The SQL queries describe associations within this dataset. They do not establish that a variable causes heart disease.
+
+For example, a higher disease-positive percentage in one category does not prove that the category itself caused the outcome. Other variables may differ between groups.
 
 ## Limitations
 
-- the dataset is small
-- the exact provenance of the repository CSV was not documented in the original commit
-- categorical encodings are dataset-specific
+- the dataset is relatively small
+- the exact original download URL for this processed CSV was not recorded
+- different processed versions of the dataset use different category encodings
 - the analysis is descriptive, not causal
-- no statistical significance testing is included
-- no adjustment is made for confounding variables
-- the dataset is not representative of every population
+- no statistical-significance testing is included
+- confounding variables are not controlled
+- the dataset does not represent every population
+- results depend on the quality and coding of the imported data
 
-## Future improvements
+## Future Improvements
 
-- verify and document the exact source file and license
-- compare the repository CSV against the source checksum and row count
-- add saved query outputs or screenshots from MySQL Workbench
-- add visualizations in Power BI, Tableau, or Python only if they add value
+- document the exact source and license of the processed CSV if recovered
+- save selected SQL result screenshots under `results/`
+- compare multiple variables together instead of only one factor at a time
 - add statistical testing where appropriate
-- separate exploratory findings from clinical interpretation
+- build a Power BI or Tableau dashboard only if it adds useful analytical context
+- compare findings with another validated heart-disease dataset
 
-## Supporting documents
+## Supporting Documents
 
-The original report and presentation are kept under `docs/` with clearer filenames.
+The original project report and presentation should be stored under `docs/` as:
 
-## Repository purpose
+```text
+docs/cardiac-health-report.docx
+docs/cardiac-health-presentation.pdf
+```
 
-This repository is best presented as a small SQL/data-analysis portfolio project. The goal is clear SQL, correct grouping logic, reproducible setup, and careful interpretation rather than unnecessary application infrastructure.
+They are kept as supporting material; the maintained SQL files are the source of truth for the current analysis.

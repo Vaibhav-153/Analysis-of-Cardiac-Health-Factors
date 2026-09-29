@@ -1,17 +1,24 @@
-# OS files
+# Operating-system files
 .DS_Store
 Thumbs.db
+Desktop.ini
 
-# Editor settings
+# Editors
 .vscode/
 .idea/
+*.swp
 
 # Office temporary files
 ~$*.docx
 ~$*.xlsx
 ~$*.pptx
 
-# Local SQL exports and scratch files
+# Local SQL / database files
+*.sqlite
+*.db
+*.bak
+
+# Temporary exports
 exports/
 temp/
-*.sql.bak
+tmp/

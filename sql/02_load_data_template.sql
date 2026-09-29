@@ -1,7 +1,10 @@
 -- MySQL 8.x
--- Replace the path below with the absolute path to data/heart_dataset.csv.
--- On Windows, forward slashes are usually easiest to use in the path.
--- LOCAL INFILE must be enabled in both the client and server.
+-- CSV import template.
+--
+-- Before running this file:
+-- 1. Update the path below.
+-- 2. Use forward slashes in Windows paths.
+-- 3. Make sure LOCAL INFILE is enabled if your MySQL setup requires it.
 
 USE cardiac_health_analysis;
 

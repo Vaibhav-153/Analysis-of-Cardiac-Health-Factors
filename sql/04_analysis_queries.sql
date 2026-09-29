@@ -1,10 +1,15 @@
 -- MySQL 8.x
 -- Descriptive analysis of the imported heart-disease dataset.
--- The queries describe associations inside this dataset; they do not establish causation.
+--
+-- These queries describe associations within this dataset.
+-- They do not establish medical causation and should not be used
+-- for individual diagnosis or treatment decisions.
 
 USE cardiac_health_analysis;
 
--- 1. Overall target distribution and prevalence
+-- ============================================================
+-- 1. Overall heart-disease prevalence
+-- ============================================================
 SELECT
     COUNT(*) AS total_records,
     SUM(CASE WHEN target = 1 THEN 1 ELSE 0 END) AS disease_positive_records,
@@ -15,7 +20,9 @@ SELECT
     ) AS disease_prevalence_pct
 FROM heart_disease_data;
 
+-- ============================================================
 -- 2. Heart-disease prevalence by sex
+-- ============================================================
 SELECT
     CASE sex
         WHEN 0 THEN 'Female'
@@ -32,7 +39,9 @@ FROM heart_disease_data
 GROUP BY sex
 ORDER BY disease_prevalence_pct DESC;
 
+-- ============================================================
 -- 3. Heart-disease prevalence by age group
+-- ============================================================
 SELECT
     CASE
         WHEN age < 40 THEN 'Under 40'
@@ -51,8 +60,10 @@ FROM heart_disease_data
 GROUP BY age_group
 ORDER BY MIN(age);
 
+-- ============================================================
 -- 4. Heart-disease prevalence by chest-pain type
--- This repository CSV uses cp codes 1-4.
+-- Project CSV coding: 1-4
+-- ============================================================
 SELECT
     CASE cp
         WHEN 1 THEN 'Typical angina'
@@ -71,7 +82,9 @@ FROM heart_disease_data
 GROUP BY cp
 ORDER BY disease_prevalence_pct DESC;
 
+-- ============================================================
 -- 5. Heart-disease prevalence by fasting-blood-sugar group
+-- ============================================================
 SELECT
     CASE fbs
         WHEN 0 THEN '<= 120 mg/dL'
@@ -88,7 +101,9 @@ FROM heart_disease_data
 GROUP BY fbs
 ORDER BY disease_prevalence_pct DESC;
 
+-- ============================================================
 -- 6. Heart-disease prevalence by cholesterol group
+-- ============================================================
 SELECT
     CASE
         WHEN chol < 200 THEN '< 200 mg/dL'
@@ -105,7 +120,9 @@ FROM heart_disease_data
 GROUP BY cholesterol_group
 ORDER BY disease_prevalence_pct DESC;
 
+-- ============================================================
 -- 7. Heart-disease prevalence by exercise-induced angina
+-- ============================================================
 SELECT
     CASE exang
         WHEN 0 THEN 'No'
@@ -122,7 +139,9 @@ FROM heart_disease_data
 GROUP BY exang
 ORDER BY disease_prevalence_pct DESC;
 
+-- ============================================================
 -- 8. Heart-disease prevalence by resting ECG code
+-- ============================================================
 SELECT
     restecg AS resting_ecg_code,
     COUNT(*) AS total_records,
@@ -135,9 +154,11 @@ FROM heart_disease_data
 GROUP BY restecg
 ORDER BY disease_prevalence_pct DESC;
 
+-- ============================================================
 -- 9. Heart-disease prevalence by number of major vessels
+-- ============================================================
 SELECT
-    ca AS major_vessels_code,
+    ca AS major_vessels,
     COUNT(*) AS total_records,
     SUM(CASE WHEN target = 1 THEN 1 ELSE 0 END) AS disease_positive_records,
     ROUND(
@@ -148,11 +169,34 @@ FROM heart_disease_data
 GROUP BY ca
 ORDER BY ca;
 
--- 10. Average continuous measurements by target class
+-- ============================================================
+-- 10. Heart-disease prevalence by thalassemia code
+-- ============================================================
+SELECT
+    CASE thal
+        WHEN 3 THEN 'Normal'
+        WHEN 6 THEN 'Fixed defect'
+        WHEN 7 THEN 'Reversible defect'
+        ELSE CONCAT('Code ', thal)
+    END AS thalassemia_group,
+    COUNT(*) AS total_records,
+    SUM(CASE WHEN target = 1 THEN 1 ELSE 0 END) AS disease_positive_records,
+    ROUND(
+        100.0 * SUM(CASE WHEN target = 1 THEN 1 ELSE 0 END) / COUNT(*),
+        2
+    ) AS disease_prevalence_pct
+FROM heart_disease_data
+GROUP BY thal
+ORDER BY disease_prevalence_pct DESC;
+
+-- ============================================================
+-- 11. Average continuous measurements by target class
+-- ============================================================
 SELECT
     CASE target
         WHEN 0 THEN 'Disease negative'
         WHEN 1 THEN 'Disease positive'
+        ELSE 'Unknown'
     END AS target_group,
     COUNT(*) AS records,
     ROUND(AVG(age), 2) AS avg_age,
