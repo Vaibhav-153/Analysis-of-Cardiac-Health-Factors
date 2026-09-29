@@ -49,13 +49,11 @@ Reference for the underlying Heart Disease dataset:
 
 https://archive.ics.uci.edu/dataset/45/heart+disease
 
-The repository CSV should also be checked against the source copy before relying on row counts, because the original GitHub file reports 303 total lines while commonly circulated copies of this processed CSV contain a header plus 303 data rows.
+The repository CSV currently contains 303 total lines: one header row and 302 data rows. Verify its exact provenance before comparing it with other processed Cleveland copies, because different public versions use different row counts and category encodings.
 
 ## Important coding note
 
-This CSV uses zero-based categorical coding for fields such as chest-pain type. For example, the processed version uses `cp` values from `0` to `3`.
-
-The original SQL used a `1` to `4` mapping for `cp`, which left `cp = 0` unmapped. The cleaned queries use the coding expected by this CSV structure.
+The repository CSV uses chest-pain codes `1` through `4`. The maintained schema and analysis queries use those values directly. Other public heart-disease CSVs may use zero-based `0` through `3` coding, so do not copy mappings from another dataset without checking the actual file.
 
 See [docs/DATA_DICTIONARY.md](docs/DATA_DICTIONARY.md) before interpreting the queries.
 
@@ -131,7 +129,7 @@ The original project was useful as a first analysis, but several query definitio
 
 ### Chest-pain coding
 
-The old query mapped `cp` as `1` to `4`. The processed CSV uses `0` to `3`, so `cp = 0` was not labelled correctly.
+The current repository CSV contains `cp` values from `1` to `4`, so the maintained schema and labels use the same `1` to `4` coding. This was verified against the file stored in `data/heart_dataset.csv`.
 
 ### Percentage by sex
 

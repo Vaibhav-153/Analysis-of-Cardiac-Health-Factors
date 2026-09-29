@@ -52,13 +52,13 @@ GROUP BY age_group
 ORDER BY MIN(age);
 
 -- 4. Heart-disease prevalence by chest-pain type
--- This repository's processed CSV uses zero-based cp codes: 0-3.
+-- This repository CSV uses cp codes 1-4.
 SELECT
     CASE cp
-        WHEN 0 THEN 'Typical angina'
-        WHEN 1 THEN 'Atypical angina'
-        WHEN 2 THEN 'Non-anginal pain'
-        WHEN 3 THEN 'Asymptomatic'
+        WHEN 1 THEN 'Typical angina'
+        WHEN 2 THEN 'Atypical angina'
+        WHEN 3 THEN 'Non-anginal pain'
+        WHEN 4 THEN 'Asymptomatic'
         ELSE 'Unknown'
     END AS chest_pain_type,
     COUNT(*) AS total_records,

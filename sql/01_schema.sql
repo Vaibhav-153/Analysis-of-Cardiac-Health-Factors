@@ -23,7 +23,7 @@ CREATE TABLE heart_disease_data (
     target TINYINT NOT NULL,
 
     CONSTRAINT chk_sex CHECK (sex IN (0, 1)),
-    CONSTRAINT chk_cp CHECK (cp BETWEEN 0 AND 3),
+    CONSTRAINT chk_cp CHECK (cp BETWEEN 1 AND 4),
     CONSTRAINT chk_fbs CHECK (fbs IN (0, 1)),
     CONSTRAINT chk_restecg CHECK (restecg BETWEEN 0 AND 2),
     CONSTRAINT chk_exang CHECK (exang IN (0, 1)),
